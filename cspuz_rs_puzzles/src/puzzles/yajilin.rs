@@ -113,7 +113,6 @@ mod tests {
 
     #[test]
     fn test_yajilin_problem1() {
-        // https://puzsq.logicpuzzle.app/puzzle/8218
         let (outside, problem) = problem_for_tests1();
         let ans = solve_yajilin(outside, &problem);
         assert!(ans.is_some());

@@ -1,17 +1,17 @@
 # cspuz_core Changes Log
 
 **Date**: April 24, 2026
-**Purpose**: Added 12 custom variant solver modules to support Morpheus puzzle platform custom rules. Also added "lightup" URL alias to existing akari solver.
+**Purpose**: Added 12 custom variant solver modules to support Morpheus puzzle platform custom rules. Added "lightup" URL alias to existing akari solver. Reverted lits.rs and yajilin.rs to standard (no flag support) since game files don't use ns/d flags.
 
 ---
 
 ## Summary
 
 - **24 new Rust source files** created (12 solver modules + 12 backend wrappers)
-- **3 existing files modified** (2 registration files + 1 solver file for alias)
+- **3 existing files modified** (2 registration files + 1 solver alias)
 - **1,738 lines** of new solver code + **522 lines** of new backend code = **2,260 lines total**
 - Binary rebuilt: `target/release/run_solver`
-- Result: Solver coverage went from 12/60 to 24/60 unique-verified puzzles
+- Result: Solver coverage went from 12/60 to **51/60** unique-verified puzzles, 0 URL parse errors
 
 ---
 
@@ -107,6 +107,12 @@ url_to_problem(combinator(), &["akari"], url)
 url_to_problem(combinator(), &["akari", "lightup"], url)
 ```
 
+### 4. `cspuz_rs/src/serializer.rs`
+
+**Change**: Added localhost URL support. Two functions updated (`url_to_puzzle_kind` and `strip_prefix`) to accept `localhost:8000/p.html?` and `localhost:8000/p?` as URL hosts, in addition to existing `puzz.link/p?`, `pzv.jp/p.html?`, and `pzprxs.vercel.app/p?`.
+
+**Note**: lits.rs and yajilin.rs were temporarily modified to handle `ns/` and `d/` URL flags, but these changes were reverted since game files don't use those flags. The standard solver (without flags) correctly solves all LITS and yajilin puzzles.
+
 ---
 
 ## Build Notes
@@ -133,9 +139,13 @@ url_to_problem(combinator(), &["akari", "lightup"], url)
 - 12/60 isUnique=true (standard solver only)
 - 30/60 "unknown puzzle type" (all *2 + lightup)
 
-### After Custom Variants
-- 24/60 isUnique=true (**doubled**)
+### After Custom Variants + Puzzle Regeneration
+- **51/60** isUnique=true (**from 12 originally**)
 - 0/60 "unknown puzzle type" (all variants now recognized)
+- Yajilin2 medium/hard puzzles regenerated for solvability under border constraint
+- Lightup2 puzzles regenerated — old grids unsolvable under correct diagonal rules, new grids verified unique
+- Norinori/nori_bridge URL encoding fix (medium) — separate vertical/horizontal bit padding
+- LITS and Yajilin use standard solver (no flag support needed — game files don't use flags)
 
 ### Per-Module Results
 
@@ -148,26 +158,37 @@ url_to_problem(combinator(), &["akari", "lightup"], url)
 | lits2.rs | 3 | 3 | 0 | 0 | 0 |
 | nurikabe2.rs | 3 | 3 | 0 | 0 | 0 |
 | tapa2.rs | 3 | 2 | 1 | 0 | 0 |
-| yajilin2.rs | 3 | 1 | 0 | 2 | 0 |
+| yajilin2.rs | 3 | 3 | 0 | 0 | 0 |
 | hitori_custom.rs | 3 | 0 | 3 | 0 | 0 |
-| lightup2.rs | 3 | 0 | 0 | 3 | 0 |
+| lightup2.rs | 3 | 3 | 0 | 0 | 0 |
 | tapa_custom.rs | 3 | 0 | 0 | 3 | 0 |
 | nurikabe_custom.rs | 3 | 0 | 1 | 0 | 2 |
+| nurikabe (standard) | 3 | 1 | 2 | 0 | 0 |
 | akari (lightup alias) | 3 | 3 | 0 | 0 | 0 |
-| **Total** | **39** | **24** | **5** | **8** | **2** |
+| Standard lits (no flags) | 3 | 3 | 0 | 0 | 0 |
+| Standard yajilin (no flags) | 3 | 3 | 0 | 0 | 0 |
+| Standard hitori | 3 | 3 | 0 | 0 | 0 |
+| Standard norinori | 3 | 0 | 3 | 0 | 0 |
+| **Total** | **48** | **38** | **7** | **3** | **0** |
 
 ### Game File Updates After Testing
 
-9 game files in `pzprjs/games/` updated with new `cspuz_is_unique` values:
+13 game files in `pzprjs/games/` updated with new `cspuz_is_unique` values:
 - puzzle_sudoku2.py: `None` → `True`
 - puzzle_heyawake2.py: `None` → `True`
 - puzzle_minesweeper2.py: `None` → `True`
 - puzzle_country2.py: `None` → `True`
 - play_lightup.py: `None` → `True`
+- play_lightup2.py: `None` → `True` (new grids generated — old grids unsolvable under correct rules)
 - play_nurikabe2.py: `None` → `True`
 - play_tapa2.py: `None` → `difficulty != "hard"`
+- custom_lits.py: `False` → `True`
 - custom_lits2.py: `None` → `True`
-- custom_yajilin2.py: `None` → `True if difficulty == "easy" else None`
+- custom_yajilin.py: `difficulty != "medium"` → `True` (all 3 unique without d/ flag)
+- custom_yajilin2.py: `None` → `True` (regenerated medium/hard puzzles)
+- play_nurikabe.py: `False if difficulty == "medium" else None` → `True if difficulty == "hard" else False` (URL bodies fixed — easy/hard now parseable)
+- hitori_game.py: `False` → `True` (all 3 unique with standard solver)
+- nori_bridge.py: `None if difficulty == "medium" else False` → `False` (URL fix, all 3 now parse, all non-unique under standard norinori rules)
 
 ---
 
@@ -202,3 +223,72 @@ Each solver module implements specific custom rules from the pzprjs AnsCheck sys
 | checkDiag4Akari | Diagonal neighbor counting for numbered walls | lightup2 |
 | checkOrthAdjacentAkari | No two lights orthogonally adjacent | lightup2 |
 | Diagonal illumination | NW-SE and NE-SW diagonal group constraints | lightup2 |
+
+---
+
+## Puzzle Regeneration
+
+### `custom_yajilin2.py` — Medium & Hard
+
+The yajilin2 solver enforces `checkShadedOnBorder` (all shaded cells must be on the grid perimeter). The original medium (5×5 `20f41q`) and hard (6×6 `k10b11u`) clue configurations were mathematically infeasible under this constraint — arrow clues demanded shaded cells in interior positions.
+
+**Fix**: Brute-force enumerated all 2-clue border-cell configurations, tested each against the solver for `hasAnswer=true` + `isUnique=true`.
+
+| Level | Old URL Body | New URL Body | Clue Description | Blocks | Lines | Required Moves |
+|-------|-------------|-------------|------------------|--------|-------|---------------|
+| Medium (5×5) | `20f41q` | `21a20v` | Down↓1 at (0,0), Down↓0 at (0,2) | 3 | 20 | 23 |
+| Hard (6×6) | `k10b11u` | `22d22zd` | Down↓2 at (0,0), Down↓2 at (0,5) | 4 | 30 | 34 |
+
+All 3 yajilin2 levels now verified: `hasAnswer=true`, `isUnique=true`.
+
+---
+
+### `play_lightup2.py` — New Grids
+
+The original lightup2 grids (`1l0n`, `1h1zg`, `1zm3m`) were genuinely unsolvable under correct custom rules. The Python solver in `play_lightup2.py` was missing the `checkOrthAdjacentAkari` rule (no two bulbs orthogonally adjacent), so it found "solutions" with adjacency violations. The Rust lightup2.rs solver correctly enforces all 3 rules and returned `hasAnswer=false`.
+
+**Fix**: Generated new grids via brute-force enumeration testing each against cspuz solver for `hasAnswer=true` + `isUnique=true`. Rewrote `play_lightup2.py` to hardcode solutions directly (removed buggy Python solver).
+
+| Level | Old URL Body | New URL Body | Walls | Bulbs | Required Moves |
+|-------|-------------|-------------|-------|-------|---------------|
+| Easy (4×4) | `1l0n` | `m2i0j` | (1,3)=2, (2,3)=0 | 4 | 4 |
+| Medium (5×5) | `1h1zg` | `n2o2l` | (1,3)=2, (3,3)=2 | 8 | 8 |
+| Hard (6×6) | `1zm3m` | `i0p0g1y` | (0,3)=0, (2,2)=0, (2,4)=1 | 9 | 9 |
+
+All 3 lightup2 levels now verified: `hasAnswer=true`, `isUnique=true`.
+
+---
+
+### `play_nurikabe.py` — URL Body Fix (Easy & Hard)
+
+The cspuz `Seq` deserializer requires URL bodies to encode ALL grid cells. pzprjs/game Python encoders omit trailing empty cells (the grid is pre-filled with -1/None). When the URL body runs out of bytes before all cells are decoded, the `Seq` combinator returns `None` → "invalid url".
+
+**Root cause**: Easy (5×5, 25 cells) URL `h2l22n1h3` encoded only 23 cells (2 trailing empties omitted). Hard (7×7, 49 cells) URL `2h1g2n1g2h1n2h1g2n1g2h1` encoded only 44 cells (5 trailing empties omitted). Medium (6×6) URL happened to encode all 36 cells — worked by coincidence.
+
+**Fix**: Appended trailing gap characters to fill the grid exactly.
+
+| Level | Old URL Body | New URL Body | Cells Encoded | Gap Added |
+|-------|-------------|-------------|---------------|-----------|
+| Easy (5×5) | `h2l22n1h3` | `h2l22n1h3h` | 23 → 25 | `h` = 2 gaps |
+| Hard (7×7) | `2h1g2n1g2h1n2h1g2n1g2h1` | `2h1g2n1g2h1n2h1g2n1g2h1k` | 44 → 49 | `k` = 5 gaps |
+
+**Results after fix**:
+- Easy: hasAnswer=true, isUnique=false
+- Medium: hasAnswer=true, isUnique=false (unchanged)
+- Hard: hasAnswer=true, isUnique=**true**
+
+---
+
+### `nori_bridge.py` — URL Encoding Fix (Medium)
+
+The cspuz `Rooms` deserializer decodes vertical and horizontal border arrays as two separate `ContextBasedGrid` calls, each padded independently to a multiple of 5 bits. The Python `_encode_border()` was encoding all bits as one continuous stream, which works when each segment's bit count is a multiple of 5 (easy 6×6: 30+30, hard 10×10: 90+90) but fails when it isn't (medium 8×8: 56+56 → needs 12+12=24 chars, but continuous encoding produces 23 chars).
+
+**Fix**: Split `_encode_border()` to encode vertical and horizontal bit arrays separately, each padded to 5-bit boundary.
+
+| Level | Old URL Body | New URL Body | Chars | Change |
+|-------|-------------|-------------|-------|--------|
+| Easy (6×6) | `aaaaaa0fo000` | `aaaaaa0fo000` | 12 | unchanged (30+30 bits) |
+| Medium (8×8) | `aikl59aaikl00000vs00000` | `aikl59aaikl000001vo00000` | 23→24 | +1 char boundary padding |
+| Hard (10×10) | `agl1a2k58agl1a2k5800vv00vv00vv000000` | unchanged | 36 | unchanged (90+90 bits) |
+
+**Results after fix**: All 3 levels: hasAnswer=true, isUnique=false. Nori Bridge is a custom game using norinori room structure — the standard norinori solver can't determine uniqueness because the actual puzzle constraints are about bridge topology.

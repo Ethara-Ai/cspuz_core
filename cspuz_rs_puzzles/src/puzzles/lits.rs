@@ -111,6 +111,8 @@ pub fn solve_lits(
                 & cell_kind_counts[4].eq(0),
         ));
     }
+
+    // Adjacent rooms can't have same tetromino shape
     for y in 0..h {
         for x in 0..w {
             if y < h - 1 && room_id[y][x] != room_id[y + 1][x] {
@@ -163,8 +165,7 @@ mod tests {
     use super::*;
     use crate::util;
 
-    fn problem_for_tests() -> graph::InnerGridEdges<Vec<Vec<bool>>> {
-        // https://github.com/semiexp/cspuz/blob/d8d6df349c6c96500a996a46e3810977b513b3de/cspuz/puzzle/lits.py#L290-L301
+    fn problem_for_tests() -> Problem {
         let height = 10;
         let width = 10;
         let base = [
@@ -200,8 +201,8 @@ mod tests {
 
     #[test]
     fn test_lits_problem() {
-        let problem = problem_for_tests();
-        let ans = solve_lits(&problem);
+        let borders = problem_for_tests();
+        let ans = solve_lits(&borders);
         assert!(ans.is_some());
         let ans = ans.unwrap();
 
