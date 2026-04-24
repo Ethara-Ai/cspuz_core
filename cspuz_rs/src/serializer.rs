@@ -1272,7 +1272,7 @@ where
         let input = &input[0];
 
         let surrounding = [&input.0[..], &input.1[..], &input.2[..], &input.3[..]].concat();
-        let ret = Seq::new(&self.base_serializer, 2 * (width + height))
+        let ret = Seq::new(&self.base_serializer, width + height)
             .serialize(ctx, &[surrounding])?
             .1;
 
@@ -1930,7 +1930,9 @@ pub fn url_to_puzzle_kind(serialized: &str) -> Option<String> {
     let serialized = serialized
         .strip_prefix("puzz.link/p?")
         .or(serialized.strip_prefix("pzv.jp/p.html?"))
-        .or(serialized.strip_prefix("pzprxs.vercel.app/p?"))?;
+        .or(serialized.strip_prefix("pzprxs.vercel.app/p?"))
+        .or(serialized.strip_prefix("localhost:8000/p.html?"))
+        .or(serialized.strip_prefix("localhost:8000/p?"))?;
     let pos = serialized.find('/')?;
     let kind = &serialized[0..pos];
     Some(String::from(kind))
@@ -1943,7 +1945,9 @@ pub fn strip_prefix(serialized: &str) -> Option<&str> {
     let serialized = serialized
         .strip_prefix("puzz.link/p?")
         .or(serialized.strip_prefix("pzv.jp/p.html?"))
-        .or(serialized.strip_prefix("pzprxs.vercel.app/p?"))?;
+        .or(serialized.strip_prefix("pzprxs.vercel.app/p?"))
+        .or(serialized.strip_prefix("localhost:8000/p.html?"))
+        .or(serialized.strip_prefix("localhost:8000/p?"))?;
     Some(serialized)
 }
 

@@ -268,7 +268,7 @@ fn solver_with_perf(input: String) -> (String, HashMap<String, f64>) {
     (res, perf_map)
 }
 
-#[pymodule(name = "cspuz_core")]
+#[pymodule(name = "cspuz_core_python")]
 pub fn cspuz_core_python_module(_py: Python, m: &Bound<'_, PyModule>) -> PyResult<()> {
     m.add_function(wrap_pyfunction!(solver, m)?)?;
     m.add_function(wrap_pyfunction!(solver_with_perf, m)?)?;
