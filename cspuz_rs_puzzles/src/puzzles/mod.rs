@@ -98,6 +98,7 @@ pub mod nanameguri;
 pub mod nanro;
 pub mod nikoji;
 pub mod nonogram;
+pub mod noribridge;
 pub mod norinori;
 pub mod norinuri;
 pub mod nothing;
