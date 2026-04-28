@@ -2,8 +2,7 @@
 // - Standard nurikabe rules EXCEPT:
 //   - checkShadeMax3: Shaded (black) connected components have at most 3 cells
 //   - checkStraightLineIslands: Each island (unshaded group with a number) must be a straight line (1×N or N×1)
-// - REMOVED: global black connectivity (standard nurikabe requires all black connected)
-// - KEPT: no 2×2 black, island sizes match clues, each island connected
+// - KEPT: global black connectivity, no 2×2 black, island sizes match clues, each island connected
 
 use crate::util;
 use cspuz_rs::graph;
