@@ -111,6 +111,7 @@ pub mod nurimaze;
 pub mod nurimisaki;
 pub mod nuritwin;
 pub mod parrot_loop;
+pub mod paritypipes;
 pub mod pencils;
 pub mod polyominous;
 pub mod putteria;
