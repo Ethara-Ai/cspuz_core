@@ -1,9 +1,10 @@
-// Custom Nurikabe variant:
-// - Standard nurikabe rules EXCEPT:
-//   - checkShadeMax3: Shaded (black) connected components have at most 3 cells
-//   - checkStraightLineIslands: Each island (unshaded group with a number) must be a straight line (1×N or N×1)
-// - REMOVED: global black connectivity (standard nurikabe requires all black connected)
-// - KEPT: no 2×2 black, island sizes match clues, each island connected
+// Custom Nurikabe variant (matches nurikabe.js custom rules):
+// - checkShadeMax3: Shaded (black) connected components have at most 3 cells
+// - checkStraightLineIslands: Each island must be a straight line (1×N or N×1)
+// - checkNoNumberInUnshade: Every island has exactly one number
+// - checkDoubleNumberInUnshade: No island has 2+ numbers
+// - checkNumberAndUnshadeSize: Island size matches clue
+// No global black connectivity. No standalone no-2×2 rule.
 
 use crate::util;
 use cspuz_rs::graph;
@@ -32,9 +33,6 @@ pub fn solve_nurikabe_custom(clues: &[Vec<Option<i32>>]) -> Option<Vec<Vec<Optio
     let group_id = solver.int_var_2d((h, w), 0, clue_pos.len() as i32);
     solver.add_expr(is_black.iff(group_id.eq(0)));
 
-    // Standard: global black connectivity
-    graph::active_vertices_connected_2d(&mut solver, is_black);
-
     // Each island connected
     for i in 1..=clue_pos.len() {
         graph::active_vertices_connected_2d(&mut solver, group_id.eq(i as i32));
@@ -56,20 +54,11 @@ pub fn solve_nurikabe_custom(clues: &[Vec<Option<i32>>]) -> Option<Vec<Vec<Optio
         ),
     );
 
-    // No 2×2 black block (same as standard)
-    solver.add_expr(!is_black.conv2d_and((2, 2)));
-
-    // Clue cells must be in their group with correct size
-    for (i, &(y, x, n)) in clue_pos.iter().enumerate() {
-        solver.add_expr(group_id.at((y, x)).eq((i + 1) as i32));
-        if n > 0 {
-            solver.add_expr(group_id.eq((i + 1) as i32).count_true().eq(n));
-        }
-    }
-
     // Forbid all tetromino placements to enforce max shaded component size of 3.
     // Every connected subgraph of 4 cells on a grid is a tetromino (I/O/L/T/S).
-    // 2×2 (O) already forbidden above. Forbid I, L, T, S in all orientations.
+    // O-tetromino (2×2 block):
+    solver.add_expr(!is_black.conv2d_and((2, 2)));
+    // I-tetromino (1×4 and 4×1):
     if w >= 4 {
         solver.add_expr(!is_black.conv2d_and((1, 4)));
     }
