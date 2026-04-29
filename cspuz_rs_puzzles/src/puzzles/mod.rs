@@ -115,6 +115,7 @@ pub mod nurikabe_custom;
 pub mod nurimaze;
 pub mod nurimisaki;
 pub mod nuritwin;
+pub mod pairloop;
 pub mod parrot_loop;
 pub mod pencils;
 pub mod polyominous;
