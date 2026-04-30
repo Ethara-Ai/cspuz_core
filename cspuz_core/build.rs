@@ -46,6 +46,7 @@ fn build_glucose() {
             .flag("-DGLUCOSE_FIX_OPTIONS")
             .flag("-DGLUCOSE_UNUSE_STDIO")
             .flag(puzzle_solver_minimal_flag)
+            .flag("-fPIC")
             .warnings(false)
             .compile("calc");
     } else {

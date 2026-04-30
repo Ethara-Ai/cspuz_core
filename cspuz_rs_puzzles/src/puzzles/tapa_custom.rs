@@ -30,10 +30,10 @@ pub fn solve_tapa_custom(clues: &[Vec<Option<[i32; 4]>>]) -> Option<Vec<Vec<Opti
     // CUSTOM: No 2x2 UNSHADED block (not shaded — opposite of standard tapa)
     solver.add_expr(!(!is_black).conv2d_and((2, 2)));
 
-    // CUSTOM: Shaded majority per row — shaded > unshaded in each row
+    // CUSTOM: Strict shaded majority per row — shaded > unshaded (pzprjs: shaded <= len-shaded fails)
     for y in 0..h {
-        let half = ((w as i32) + 1) / 2; // ceil(w/2) = minimum shaded for majority
-        solver.add_expr(is_black.slice_fixed_y((y, ..)).count_true().ge(half));
+        let min_shaded = (w as i32) / 2 + 1; // strict: shaded > w/2 → shaded >= floor(w/2)+1
+        solver.add_expr(is_black.slice_fixed_y((y, ..)).count_true().ge(min_shaded));
     }
 
     // Standard tapa clue logic (unchanged)

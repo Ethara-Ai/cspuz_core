@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 
-# A simple wrapper for emcc that changes the output file extension to .js
+# A simple wrapper for emcc that:
+# 1. Changes the output file extension to .js
+# 2. Overrides Rust's -sSIDE_MODULE=2 with -sSIDE_MODULE=0 to produce a main module
+#    (with JS glue + WASM output)
 
 import argparse
 import os
 import subprocess
+import sys
 
 
 def main():
@@ -20,9 +24,14 @@ def main():
     if os.path.basename(root) == "cspuz_solver_backend":
         extra_args += ["-s", "EXPORTED_FUNCTIONS=_solve_problem,_enumerate_answers_problem,_malloc,_free"]
 
-    remove_arg = "-sSIDE_MODULE=2"
-    if remove_arg in extra_args:
-        extra_args.remove(remove_arg)
+    # Override Rust's -sSIDE_MODULE=2 to produce a standalone main module with JS glue.
+    # Emscripten 5.x enforces side modules as .wasm-only (no JS glue), so we need main module mode.
+    # The last -sSIDE_MODULE wins.
+    extra_args += ["-sSIDE_MODULE=0"]
+
+    # Emscripten 5.x treats undefined exported symbols as errors by default.
+    # _malloc/_free are provided by the Emscripten runtime at link time, so suppress this check.
+    extra_args += ["-sERROR_ON_UNDEFINED_SYMBOLS=0"]
 
     args = ["emcc", "-o", output] + extra_args
     subprocess.check_call(args)
