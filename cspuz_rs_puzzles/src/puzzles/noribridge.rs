@@ -1,4 +1,4 @@
-use cspuz_rs::graph::{self, Graph, active_vertices_connected_via_active_edges};
+use cspuz_rs::graph::{self, active_vertices_connected_via_active_edges, Graph};
 use cspuz_rs::serializer::{
     problem_to_url_with_context, url_to_problem, Choice, Combinator, Context, Dict, HexInt,
     Optionalize, RoomsWithValues, Size, Spaces,
@@ -151,9 +151,13 @@ mod tests {
         // Medium 8×8
         let borders_m = graph::InnerGridEdges {
             horizontal: vec![
-                vec![false; 8], vec![false; 8], vec![false; 8],
+                vec![false; 8],
+                vec![false; 8],
+                vec![false; 8],
                 vec![true; 8],
-                vec![false; 8], vec![false; 8], vec![false; 8],
+                vec![false; 8],
+                vec![false; 8],
+                vec![false; 8],
             ],
             vertical: vec![
                 vec![false, true, false, true, false, true, false],
@@ -166,7 +170,16 @@ mod tests {
                 vec![false, true, false, true, false, true, false],
             ],
         };
-        let clues_m = vec![None, Some(3), Some(3), None, Some(1), Some(1), Some(1), Some(1)];
+        let clues_m = vec![
+            None,
+            Some(3),
+            Some(3),
+            None,
+            Some(1),
+            Some(1),
+            Some(1),
+            Some(1),
+        ];
         let url_m = serialize_problem(&(borders_m, clues_m)).unwrap();
         eprintln!("MEDIUM: {}", url_m);
 
@@ -179,7 +192,9 @@ mod tests {
                 vec![true; 10],
                 vec![false; 10],
                 vec![true; 10],
-                vec![false; 10], vec![false; 10], vec![false; 10],
+                vec![false; 10],
+                vec![false; 10],
+                vec![false; 10],
             ],
             vertical: vec![
                 vec![false, true, false, true, false, true, false, false, false],
@@ -194,7 +209,24 @@ mod tests {
                 vec![false, true, false, true, false, true, false, false, false],
             ],
         };
-        let clues_h = vec![Some(2), Some(3), Some(3), Some(2), Some(2), Some(2), Some(2), Some(2), Some(2), Some(2), Some(2), Some(2), Some(1), Some(1), Some(1), Some(1)];
+        let clues_h = vec![
+            Some(2),
+            Some(3),
+            Some(3),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(2),
+            Some(1),
+            Some(1),
+            Some(1),
+            Some(1),
+        ];
         let url_h = serialize_problem(&(borders_h, clues_h)).unwrap();
         eprintln!("HARD: {}", url_h);
     }

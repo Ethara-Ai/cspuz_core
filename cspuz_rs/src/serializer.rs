@@ -1932,7 +1932,9 @@ pub fn url_to_puzzle_kind(serialized: &str) -> Option<String> {
         .or(serialized.strip_prefix("pzv.jp/p.html?"))
         .or(serialized.strip_prefix("pzprxs.vercel.app/p?"))
         .or(serialized.strip_prefix("localhost:8000/p.html?"))
-        .or(serialized.strip_prefix("localhost:8000/p?"))?;
+        .or(serialized.strip_prefix("localhost:8000/p?"))
+        .or(serialized.strip_prefix("localhost:3000/p.html?"))
+        .or(serialized.strip_prefix("localhost:3000/p?"))?;
     let pos = serialized.find('/')?;
     let kind = &serialized[0..pos];
     Some(String::from(kind))
@@ -1947,7 +1949,9 @@ pub fn strip_prefix(serialized: &str) -> Option<&str> {
         .or(serialized.strip_prefix("pzv.jp/p.html?"))
         .or(serialized.strip_prefix("pzprxs.vercel.app/p?"))
         .or(serialized.strip_prefix("localhost:8000/p.html?"))
-        .or(serialized.strip_prefix("localhost:8000/p?"))?;
+        .or(serialized.strip_prefix("localhost:8000/p?"))
+        .or(serialized.strip_prefix("localhost:3000/p.html?"))
+        .or(serialized.strip_prefix("localhost:3000/p?"))?;
     Some(serialized)
 }
 

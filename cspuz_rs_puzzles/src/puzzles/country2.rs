@@ -126,18 +126,12 @@ pub fn solve_country2(
                 // Turn = on loop AND has exactly 1 horizontal and 1 vertical
                 // = is_passed AND count_h == 1 AND count_v == 1
                 let is_turn = &solver.bool_var();
+                solver.add_expr(is_turn.imp(
+                    is_passed.at((y, x)) & count_true(&h_segs).eq(1) & count_true(&v_segs).eq(1),
+                ));
                 solver.add_expr(
-                    is_turn.imp(
-                        is_passed.at((y, x))
-                            & count_true(&h_segs).eq(1)
-                            & count_true(&v_segs).eq(1),
-                    ),
-                );
-                solver.add_expr(
-                    (is_passed.at((y, x))
-                        & count_true(&h_segs).eq(1)
-                        & count_true(&v_segs).eq(1))
-                    .imp(is_turn),
+                    (is_passed.at((y, x)) & count_true(&h_segs).eq(1) & count_true(&v_segs).eq(1))
+                        .imp(is_turn),
                 );
                 turn_indicators.push(is_turn.expr());
             }

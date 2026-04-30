@@ -16,7 +16,11 @@ use cspuz_rs::serializer::{
 pub fn solve_noribridge_custom(
     borders: &graph::InnerGridEdges<Vec<Vec<bool>>>,
     clues: &[Option<i32>],
-) -> Option<(Vec<Vec<Option<bool>>>, Vec<Option<bool>>, Vec<(usize, usize)>)> {
+) -> Option<(
+    Vec<Vec<Option<bool>>>,
+    Vec<Option<bool>>,
+    Vec<(usize, usize)>,
+)> {
     let (h, w) = borders.base_shape();
 
     let result = super::noribridge::solve_noribridge(borders, clues)?;

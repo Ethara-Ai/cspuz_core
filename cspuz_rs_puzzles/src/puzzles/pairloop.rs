@@ -40,7 +40,11 @@ pub fn enumerate_answers_pairloop(
         .collect()
 }
 
-fn add_constraints(solver: &mut Solver, is_line: &graph::BoolGridEdges, clues: &[Vec<Option<i32>>]) {
+fn add_constraints(
+    solver: &mut Solver,
+    is_line: &graph::BoolGridEdges,
+    clues: &[Vec<Option<i32>>],
+) {
     let (h, w) = util::infer_shape(clues);
 
     graph::single_cycle_grid_edges(solver, is_line);

@@ -40,9 +40,7 @@ pub fn solve_lightup2(clues: &[Vec<Option<i32>>]) -> Option<Vec<Vec<Option<bool>
                         diag_neighbors.push(has_light.at((y + 1, x + 1)).clone());
                     }
                     // Sum of diagonal neighbors == n
-                    solver.add_expr(
-                        cspuz_rs::solver::count_true(&diag_neighbors).eq(n),
-                    );
+                    solver.add_expr(cspuz_rs::solver::count_true(&diag_neighbors).eq(n));
                 }
             }
         }
@@ -82,7 +80,11 @@ pub fn solve_lightup2(clues: &[Vec<Option<i32>>]) -> Option<Vec<Vec<Option<bool>
     for start_sum in -(w as i32 - 1)..=(h as i32 - 1) {
         // y - x = start_sum
         let mut segment: Vec<(usize, usize)> = vec![];
-        let y_start = if start_sum >= 0 { start_sum as usize } else { 0 };
+        let y_start = if start_sum >= 0 {
+            start_sum as usize
+        } else {
+            0
+        };
         let y_end = std::cmp::min(h, (w as i32 + start_sum) as usize);
         for y in y_start..y_end {
             let x = (y as i32 - start_sum) as usize;
