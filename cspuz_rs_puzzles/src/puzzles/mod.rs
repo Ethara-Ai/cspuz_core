@@ -125,6 +125,7 @@ pub mod pyramid;
 pub mod pyramid_climbers;
 pub mod radiance;
 pub mod reflect;
+pub mod resonance;
 pub mod ringring;
 pub mod ripple;
 pub mod roma;
