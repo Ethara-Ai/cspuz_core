@@ -1,3 +1,5 @@
+> **HISTORICAL DOCUMENT** — This file documents 13 custom solver modules and their development history. All modules referenced below were DELETED during the May 2026 cleanup. The current cspuz_core has 7 active custom solver modules: tidepool.rs, paritypipes.rs, radiance.rs, gradientwalls.rs, kageboshi.rs, resonance.rs, pairloop.rs. See `cspuz_solver_backend/src/puzzle/mod.rs` for current registrations.
+
 # cspuz_core Changes Log
 
 **Date**: April 24, 2026
@@ -333,3 +335,22 @@ Also created `noribridge.js` pzprjs variety file (359 lines) with full AnsCheck,
 | Hard (10×10) | noribridge | 16 | 16 | **true** |
 
 **`cspuz_is_unique`**: `False` → `True`
+
+---
+
+## Cleanup Summary (May 2026)
+
+All 13 custom solver modules documented above were removed:
+- **9 `*2` variants**: sudoku2, heyawake2, minesweeper2, country2, tapa2, yajilin2, lits2, nurikabe2, lightup2
+- **4 other custom modules**: hitori_custom, tapa_custom, nurikabe_custom, noribridge
+
+Additionally, 10 `*_custom` backend wrappers that were shadowing base solvers were removed:
+- sudoku_custom, heyawake_custom, hitori_custom, lightup_custom, minesweeper_custom, noribridge_custom, nurikabe_custom, tapa_custom, yajilin_custom, country_custom
+
+### Current State (May 2026)
+
+- **7 active custom solver modules**: tidepool.rs, paritypipes.rs, radiance.rs, gradientwalls.rs, kageboshi.rs, resonance.rs, pairloop.rs
+- **~159 upstream solver modules**: Fully intact, no functionality removed
+- **Binary**: `target/release/run_solver` (5.7MB)
+- **Build**: `cargo build --release` — SUCCESS (4 pre-existing dead_code warnings only)
+- **Verification**: 21/21 puzzles solver-verified unique
